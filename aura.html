@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Aura</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+color:white;
+background:black;
+overflow-x:hidden;
+}
+
+/* FUNDO ESTRELADO */
+
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background-image:
+radial-gradient(white 1px, transparent 1px),
+radial-gradient(white 1px, transparent 1px);
+background-size:80px 80px;
+background-position:0 0, 40px 40px;
+opacity:0.15;
+animation:starsMove 120s linear infinite;
+z-index:-1;
+}
+
+@keyframes starsMove{
+from{transform:translateY(0);}
+to{transform:translateY(-2000px);}
+}
+
+/* SEÇÕES */
+
+.section{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+opacity:0;
+transform:translateY(60px);
+transition:all 1s ease;
+}
+
+.section.visible{
+opacity:1;
+transform:translateY(0);
+}
+
+/* FAIXA ESCURA */
+
+.overlay{
+background:rgba(0,0,0,0.75);
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:80px 20px;
+}
+
+/* CONTEÚDO */
+
+.content{
+max-width:1100px;
+display:flex;
+flex-wrap:wrap;
+gap:40px;
+align-items:center;
+}
+
+/* TEXTO */
+
+.text{
+flex:1;
+min-width:300px;
+}
+
+h1{
+font-size:70px;
+margin-bottom:20px;
+background:linear-gradient(45deg,#ff6ec4,#7873f5);
+-webkit-background-clip:text;
+color:transparent;
+text-shadow:0 0 20px rgba(255,110,196,0.5);
+}
+
+h2{
+font-size:36px;
+margin-bottom:20px;
+color:#ff6ec4;
+}
+
+p{
+font-size:19px;
+line-height:1.8;
+}
+
+/* IMAGEM */
+
+.image{
+flex:1;
+min-width:300px;
+}
+
+.image img{
+width:100%;
+border-radius:15px;
+box-shadow:0 20px 40px rgba(0,0,0,0.6);
+}
+
+/* PLAYER */
+
+.player{
+position:fixed;
+top:20px;
+right:20px;
+z-index:10;
+display:flex;
+align-items:center;
+gap:12px;
+background:rgba(0,0,0,0.35);
+padding:10px 14px;
+border-radius:999px;
+backdrop-filter:blur(8px);
+}
+
+/* BOTÃO */
+
+button{
+background:linear-gradient(45deg,#ff6ec4,#7873f5);
+border:none;
+padding:10px 16px;
+border-radius:30px;
+color:white;
+cursor:pointer;
+font-weight:600;
+box-shadow:0 10px 30px rgba(255,110,196,0.4);
+transition:all 0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+box-shadow:0 10px 40px rgba(255,110,196,0.7);
+}
+
+/* VOLUME */
+
+.volume{
+-webkit-appearance:none;
+appearance:none;
+width:120px;
+height:4px;
+background:#ff6ec4;
+border-radius:4px;
+cursor:pointer;
+outline:none;
+}
+
+/* trilho */
+
+.volume::-webkit-slider-runnable-track{
+height:4px;
+background:#ff6ec4;
+border-radius:4px;
+}
+
+/* thumb com tulipa */
+/*
+.volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+appearance:none;
+width:22px;
+height:22px;
+margin-top:-9px;
+background:url("tulipa.png");
+background-size:contain;
+background-repeat:no-repeat;
+background-position:center;
+border:none;
+cursor:pointer;
+}*/
+.volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+appearance:none;
+
+width:22px;
+height:22px;
+
+margin-top:-9px;
+
+background:url("tulipa.png");
+
+background-size:contain;
+background-repeat:no-repeat;
+background-position:center;
+
+border:none;
+cursor:pointer;
+}
+
+/* firefox */
+/*
+.volume::-moz-range-thumb{
+width:22px;
+height:22px;
+border:none;
+background:url("tulipa.png");
+background-size:contain;
+background-repeat:no-repeat;
+background-position:center;
+}
+*/
+.volume::-moz-range-thumb{
+width:22px;
+height:22px;
+
+border:none;
+
+background:url("tulipa.png");
+
+background-size:contain;
+background-repeat:no-repeat;
+background-position:center;
+}
+/* PÉTALAS */
+
+.petal{
+position:fixed;
+top:-50px;
+font-size:22px;
+pointer-events:none;
+animation:fall linear infinite;
+z-index:2;
+}
+
+@keyframes fall{
+0%{transform:translateY(-10vh) rotate(0deg);}
+100%{transform:translateY(110vh) rotate(360deg);}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="player">
+
+<button onclick="toggleMusic()">🎧 música</button>
+
+<input
+type="range"
+min="0"
+max="1"
+step="0.01"
+value="0.5"
+class="volume"
+oninput="setVolume(this.value)">
+
+</div>
+
+<audio id="music" loop>
+<source src="linkinpark.mp3" type="audio/mpeg">
+</audio>
+
+<!-- DIA DAS MULHERES -->
+
+<section class="section" style="background-image:url('aura_w.png');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Dia Internacional da Mulher</h2>
+
+<p>Antes de qualquer outra coisa: Feliz Dia das Mulheres.</p>
+
+<p>Esse site existe por um motivo bem simples. Você é muito foda.</p>
+
+<p>
+A ideia aqui não é fazer drama nem declaração exagerada.
+É só registrar uma coisa que já ficou clara nas nossas conversas.
+Você é uma mulher forte, trabalhadora, inteligente e muito mais incrível do que muita gente talvez tenha percebido.
+</p>
+
+</div>
+
+<div class="image">
+<img src="aura_w.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- INTRO -->
+
+<section class="section" style="background-image:url('imagem_1.jpg');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h1>Amanda Alves</h1>
+
+<p>Eu conheci a Aura jogando.</p>
+<p>Entre partidas, conversa em call e aquelas risadas que aparecem do nada.</p>
+<p>Com o tempo eu percebi uma coisa simples.</p>
+<p>Ela não é só mais uma pessoa aleatória na internet.</p>
+<p>Ela é alguém que vale a pena conhecer.</p>
+
+</div>
+
+<div class="image">
+<img src="Aura_j2.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- CARROS -->
+
+<section class="section" style="background-image:url('Briam.gif');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Excelente gosto</h2>
+
+<p>A Aura tem excelentes gostos.</p>
+<p>Um deles, curiosamente, é para carros.</p>
+<p>Especialmente um clássico que marcou muita gente que cresceu jogando corrida.</p>
+<p>O BMW M3.</p>
+<p>É um daqueles carros que não precisam provar nada.</p>
+<p>Assim como ela.</p>
+
+</div>
+
+<div class="image">
+<img src="BMW.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- SOBRE ELA -->
+
+<section class="section" style="background-image:url('tulipas.jpeg');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Quem ela é</h2>
+
+<p>A Aura é uma mulher forte.</p>
+<p>Trabalhadora.</p>
+<p>Daquelas pessoas que fazem o que precisam fazer e continuam seguindo em frente.</p>
+<p>Ela já passou por coisas difíceis que teriam derrubado muita gente.</p>
+<p>Mas continua ali.</p>
+<p>Firme.</p>
+<p>Sem precisar provar nada para ninguém. Nunca precisou.</p>
+
+</div>
+
+<div class="image">
+<img src="Trabalho.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- KARAOKE -->
+
+<section class="section" style="background-image:url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Karaokê</h2>
+
+<p>Uma das coisas que a gente combinou de fazer quando eu for para Pernambuco é cantar no karaokê.</p>
+<p>É uma coisa simples e divertida para fazermos.</p>
+<p>Mas sendo bem honesto, também é um pouco de desculpa para ouvir ela cantar.</p>
+<p>Ela já comentou que cantava na igreja.</p>
+<p>Então eu já sei que vai ser interessante.</p>
+
+</div>
+
+<div class="image">
+<img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- SIMPLICIDADE -->
+
+<section class="section" style="background-image:url('https://www.sabornamesa.com.br/media/k2/items/cache/3f6926ce145b6fd2c270d507ee89d5ef_XL.jpg');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Simplicidade</h2>
+
+<p>Uma das coisas mais legais sobre a Aura é que ela não tem frescura.</p>
+<P>Gosta de umas das coisas que eu mais sei fazer, massa.</P>
+<p>Ela é simples de um jeito raro hoje em dia.</p>
+<p>E sinceramente, vai ser uma honra levar ela para fazer uma coisa simples também.</p>
+<p>Comer um pastel.</p>
+<p>Tomar um caldo de cana.</p>
+<p>Porque às vezes os melhores momentos são exatamente esses.</p>
+
+</div>
+
+<div class="image">
+<img src="https://www.sabornamesa.com.br/media/k2/items/cache/3f6926ce145b6fd2c270d507ee89d5ef_XL.jpg">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- CURIOSIDADES -->
+
+<section class="section" style="background-image:url('https://images.unsplash.com/photo-1511512578047-dfb367046420');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Curiosidades</h2>
+
+<p>Ela gosta de flores.</p>
+<p>Gosta de música.</p>
+<p>Gosta de jogos.</p>
+<p>Tem um gosto curioso por carros.</p>
+<p>E ao mesmo tempo consegue ser uma pessoa tranquila, simples, direta e feminina.</p>
+<p>Talvez seja exatamente por isso que as pessoas gostam dela.</p>
+<p>Ela não tenta parecer algo que não é.</p>
+<p>Ela simplesmente é.</p>
+
+</div>
+
+<div class="image">
+<img src="https://images.unsplash.com/photo-1511512578047-dfb367046420">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Super Tia -->
+
+<section class="section" style="background-image:url('superAura.png');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Super Tia</h2>
+
+<p>Você é uma tia incrível.</p>
+<p>O Heitor deve te enxergar da mesma forma que ao lado, a Super Aura.</p>
+<p>Tudo o que você me disse sobre ele, que imagino ser uma criança muito carinhosa e boazinha,
+    é reflexo da "dinda" dele. 
+   Eu sei que as situações pegam lá no fundo do seu peito e te deixam emocionada, da pra perceber
+   na sua voz.
+   Você faz por ele o que não fizeram por você. Sério, a cada palavra que eu digito eu te adimiro mais.
+   Acho que ta virando minha Heroina também kk. 
+</p>
+</div>
+
+<div class="image">
+<img src="superAura.png">
+</div>
+
+</div>
+</div>
+</section>
+
+
+<!-- Valorant -->
+
+<section class="section" style="background-image:url('agentes.png');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Aspectos que trancendem realidades</h2>
+
+<p>Apenas chegar aqui e dizer que você é foda, que você é legal,</p><p>que você é incrível, é muito fácil e também um pouco genérico.</p> 
+<p>Por isso eu vou te dar um exemplo real, de uma coisa que a gente observa todo dia e que talvez você não tenha pensado dessa maneira.</p>
+<p>Mas isso já está em você, direta ou indireta e dá para perceber.</p>
+</div>
+
+<div class="image">
+<img src="agentes.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Reyna -->
+
+<section class="section" style="background-image:url('Reyna.png');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>A Aura da Reyna</h2>
+<p>
+Quando você joga de Reyna eu sempre acho interessante, porque faz muito sentido.
+A Reyna é uma personagem forte, confiante, que entra no jogo sabendo do que é capaz.
+E eu vejo muito disso em você também.
+</p>
+
+<p>
+Você é uma pessoa que passou por muita coisa na vida e mesmo assim continuou seguindo em frente.
+Sem precisar provar nada para ninguém, sem precisar ficar se exibindo ou tentando impressionar os outros.
+</p>
+
+<p>
+É aquela força silenciosa que simplesmente existe e todos notam sem precisar ao menos anunciar.
+Presença, confiança e a sensação clara de que não é alguém para subestimar.
+</p>
+</div>
+
+<div class="image">
+<img src="Reyna.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Fade -->
+
+<section class="section" style="background-image:url('Fade.png');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>A Sensibilidade da Fade</h2>
+
+<p>
+E quando você joga de Fade eu também vejo outra coisa que combina muito com você.
+A Fade é uma personagem muito perceptiva, que entende o ambiente, as pessoas e as emoções ao redor.
+</p>
+
+<p>
+Você também tem isso.
+Essa capacidade de perceber as coisas, de entender situações e pessoas de uma forma mais profunda.
+</p>
+
+<p>
+A Fade é intensa, complexa, e não é uma personagem superficial.
+E olhando para sua história e para tudo que você já viveu, dá para ver que você também carrega essa profundidade.
+</p>
+</div>
+
+<div class="image">
+<img src="Fade.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- Viper -->
+
+<section class="section" style="background-image:url('Viper.png');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>A Inteligencia da Viper</h2>
+
+<p>
+E quando você joga de Viper aparece um lado seu que eu admiro muito.
+A Viper é extremamente inteligente, estratégica e determinada.
+</p>
+
+<p>
+E isso combina muito com você.
+Passar em Medicina em segundo lugar na UFMG não acontece por acaso.
+Isso mostra disciplina, foco e muita dedicação.
+</p>
+
+<p>
+A Viper carrega responsabilidade e sabe exatamente o que está fazendo.
+E olhando para tudo que você construiu na sua vida, eu vejo muito dessa mesma determinação em você.
+</p>
+</div>
+
+<div class="image">
+<img src="Viper.png">
+</div>
+
+</div>
+</div>
+</section>
+
+<!-- FINAL -->
+
+<section class="section" style="background-image:url('Malero.jpg');">
+
+<div class="overlay">
+<div class="content">
+
+<div class="text">
+
+<h2>Última coisa</h2>
+
+<p>Espero que tenha conseguido te lembrar ou mesmo te mostrar que você não é qualquer uma.</p>
+<p> Você é uma excelente pessoa, talvez mais do que eu tenha conseguido mostrar aqui.</p>
+<p>Eu tenho orgulho de fazer parte dos Rangers e ter uma pessoa tão foda do lado.</p>
+<p>Aprendo muito com você e espero continuar aprendendo muito mais.</p>
+<p>Mulheres como você é que dão sentido a esse dia. Acredite, você é rara.</p>
+<p>Parabens pelo seu dia, Amanda.</p>
+
+
+</div>
+
+<div class="image">
+<img src="Malero.jpg">
+</div>
+
+</div>
+</div>
+</section>
+
+<script>
+
+/* PETALAS */
+
+for(let i=0;i<30;i++){
+
+let petal=document.createElement("div")
+petal.className="petal"
+petal.innerHTML=Math.random()>0.5?"🌸":"🌷"
+petal.style.left=Math.random()*100+"vw"
+petal.style.animationDuration=(10+Math.random()*10)+"s"
+petal.style.opacity=Math.random()
+document.body.appendChild(petal)
+
+}
+
+/* ANIMAÇÃO SEÇÕES */
+
+const sections = document.querySelectorAll(".section");
+
+const observer = new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add("visible");
+}
+});
+});
+
+sections.forEach(section=>{
+observer.observe(section);
+});
+
+/* MÚSICA */
+
+function toggleMusic(){
+
+let music=document.getElementById("music")
+
+if(music.paused){
+music.play()
+}else{
+music.pause()
+}
+
+}
+
+function setVolume(value){
+
+let music=document.getElementById("music")
+music.volume=value
+
+}
+
+document.getElementById("music").volume = 0.5;
+
+</script>
+
+</body>
+</html>
